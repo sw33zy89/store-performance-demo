@@ -1,0 +1,22 @@
+services:
+
+  performancetest.db:
+    image: ${DOCKER_REGISTRY-}perfomancetestdb
+    container_name: performancetest.db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    build:
+      context: .
+      dockerfile: database/Dockerfile
+    ports:
+      - "56380:80"
+      - "44325:443"
+  performancetest.api:
+    image: ${DOCKER_REGISTRY-}performancetestapi
+    container_name: performancetest.api
+    build:
+      context: .
+      dockerfile: PerformanceTest.API/Dockerfile
+    ports: 
+       - "31433:1433"
