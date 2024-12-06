@@ -19,6 +19,7 @@ namespace PerformanceTesting.Infrastructure.Persistence
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Store> Stores { get; set; }
+        public DbSet<StoreVisit> StoreVisits { get; set; }
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {

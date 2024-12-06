@@ -46,9 +46,25 @@ namespace PerformanceTesting.Infrastructure.Persistence
 
         public async Task TrySeedAsync()
         {
-            if (! await _context.Customers.AnyAsync())
+            Random random = new Random();
+            if (! await _context.Stores.AnyAsync())
             {
-                for (int i = 0; i < 10000; i++)
+                int storeCount = 10000;
+                int numCustomers = 10000;
+                List<Store> stores = new List<Store>();
+                for (int i = 0; i < storeCount; i++)
+                {
+                    Address storeAddress = DataGenerator.GenerateRandomAddress();
+                    _context.Addresses.Add(storeAddress);
+                    await _context.SaveChangesAsync();
+
+                    Store store = DataGenerator.GenerateRandomStore(storeAddress);
+                    _context.Stores.Add(store);
+                    await _context.SaveChangesAsync();
+
+                    stores.Add(store);
+                }
+                for (int i = 0; i < numCustomers; i++)
                 {
                     Address address = DataGenerator.GenerateRandomAddress();
                     _context.Addresses.Add(address);
@@ -60,12 +76,7 @@ namespace PerformanceTesting.Infrastructure.Persistence
 
                     await _context.SaveChangesAsync();
 
-                    Address storeAddress = DataGenerator.GenerateRandomAddress();
-                    _context.Addresses.Add(storeAddress);
-                    await _context.SaveChangesAsync();
-
-                    Store store = DataGenerator.GenerateRandomStore(storeAddress);
-                    _context.Stores.Add(store);
+                    List<StoreVisit> visits = DataGenerator.GenerateVisits(customer, stores);
                     await _context.SaveChangesAsync();
                 }
             }

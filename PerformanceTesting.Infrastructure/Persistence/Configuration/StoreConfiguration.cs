@@ -15,8 +15,6 @@ namespace PerformanceTesting.Infrastructure.Persistence.Configuration
                 .IsRequired();
 
             builder.HasOne(x => x.Address);
-
-            builder.HasIndex(x => x.Address);
         }
     }
 }

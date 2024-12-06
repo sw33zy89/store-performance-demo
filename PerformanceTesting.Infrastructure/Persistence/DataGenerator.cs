@@ -1,4 +1,5 @@
 ﻿using PerformanceTesting.Core;
+using System;
 
 namespace PerformanceTesting.Infrastructure.Persistence
 {
@@ -52,6 +53,28 @@ namespace PerformanceTesting.Infrastructure.Persistence
             GeoCoordinates coords = GeoCoordinates.Create(latitude, longitude).Value;
 
             return Address.Create(street, address2, city, state, "USA", coords).Value;
+        }
+
+        public static List<StoreVisit> GenerateVisits(Customer customer, List<Store> stores)
+        {
+            List<StoreVisit> visits = new List<StoreVisit>();
+
+            int storeCount = stores.Count;
+            Random random = new Random();
+            int numVisits = random.Next(1, 10);
+            for (int v = 0; v < numVisits; v++)
+            {
+                Store store = stores[random.Next(storeCount - 1)];
+                DateTime visitTime = DateTime.Now
+                    .AddDays(random.Next(180))
+                    .AddHours(random.Next(24))
+                    .AddMinutes(random.Next(60))
+                    .AddSeconds(random.Next(60))
+                ;
+                visits.Add(customer.VisitStore(store, visitTime).Value);
+            }
+
+            return visits;
         }
     }
 }
