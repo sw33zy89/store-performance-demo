@@ -10,13 +10,14 @@ services:
   performancetest.api:
     image: ${DOCKER_REGISTRY-}performancetestapi
     container_name: performancetest.api
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
     build:
       context: .
       dockerfile: PerformanceTest.API/Dockerfile
     ports:
-      - "56380:80"
-      - "44325:443"
+      - "8080"
+      - "8081"
+    depends_on:
+      - performancetest.db
+    restart: on-failure
+
        
