@@ -3,7 +3,7 @@
 namespace PerformanceTest.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/test")]
     public class TestController : Controller
     {
         [HttpGet]

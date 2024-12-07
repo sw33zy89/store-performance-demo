@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PerformanceTesting.Core.Services;
 using PerformanceTesting.Infrastructure.Persistence;
+using PerformanceTesting.Infrastructure.Services;
 
 namespace PerformanceTesting.Infrastructure
 {
@@ -26,6 +28,7 @@ namespace PerformanceTesting.Infrastructure
             }
 
             services.AddScoped<AppDbContextInitializer>();
+            services.AddScoped<ICustomerService, CustomerService>();
             
             return services;
         }
