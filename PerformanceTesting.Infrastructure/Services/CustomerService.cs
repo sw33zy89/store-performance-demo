@@ -7,58 +7,80 @@ namespace PerformanceTesting.Infrastructure.Services
 {
     public class CustomerService : ICustomerService
     {
-        private readonly AppDbContext Db;
-        public CustomerService(AppDbContext dbContext)
+        private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
+        public CustomerService(IDbContextFactory<AppDbContext> dbContextFactory)
         {
-            Db = dbContext;
+            _dbContextFactory = dbContextFactory;
         }
 
         public Customer? GetCustomer(int id, bool useSplitQuery = false)
         {
-            return Db.Customers
-                .Where(c => c.Id == id)
-                .IncludeDependencies(useSplitQuery)
-                .FirstOrDefault();
+            using (var Db = _dbContextFactory.CreateDbContext())
+            {
+                return Db.Customers
+                    .Where(c => c.Id == id)
+                    .IncludeDependencies(useSplitQuery)
+                    .AsNoTracking()
+                    .FirstOrDefault();
+            }
         }
 
         public async Task<Customer?> GetCustomerAsync(int id, bool useSplitQuery = false, CancellationToken cancellationToken = default)
         {
-            return await Db.Customers
-                .Where(c => c.Id == id)
-                .IncludeDependencies(useSplitQuery)
-                .FirstOrDefaultAsync(cancellationToken);
+            using (var Db = await _dbContextFactory.CreateDbContextAsync(cancellationToken))
+            {
+                return await Db.Customers
+                    .Where(c => c.Id == id)
+                    .IncludeDependencies(useSplitQuery)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(cancellationToken);
+            }
         }
 
         public List<Customer> GetCustomers(List<int> ids, bool useSplitQuery = false)
         {
-            return Db.Customers
-                .Where(c => ids.Contains(c.Id))
-                .IncludeDependencies(useSplitQuery)
-                .ToList();
+            using (var Db = _dbContextFactory.CreateDbContext())
+            {
+                return Db.Customers
+                    .Where(c => ids.Contains(c.Id))
+                    .IncludeDependencies(useSplitQuery)
+                    .AsNoTracking()
+                    .ToList();
+            }
         }
 
         public async Task<List<Customer>> GetCustomersAsync(List<int> ids, bool useSplitQuery = false, CancellationToken cancellationToken = default)
         {
-            return await Db.Customers
-                .Where(c => ids.Contains(c.Id))
-                .IncludeDependencies(useSplitQuery)
-                .ToListAsync(cancellationToken);
+            using (var Db = await _dbContextFactory.CreateDbContextAsync(cancellationToken))
+            {
+                return await Db.Customers
+                    .Where(c => ids.Contains(c.Id))
+                    .IncludeDependencies(useSplitQuery)
+                    .AsNoTracking()
+                    .ToListAsync(cancellationToken);
+            }
         }
 
         public Customer Insert(Customer customer)
         {
-            Db.Customers.Add(customer);
-            Db.SaveChanges();
+            using (var Db = _dbContextFactory.CreateDbContext())
+            {
+                Db.Customers.Add(customer);
+                Db.SaveChanges();
 
-            return customer;
+                return customer;
+            }
         }
 
         public async Task<Customer> InsertAsync(Customer customer, CancellationToken cancellationToken = default)
         {
-            await Db.Customers.AddAsync(customer);
-            await Db.SaveChangesAsync(cancellationToken);
+            using (var Db = await _dbContextFactory.CreateDbContextAsync(cancellationToken))
+            {
+                await Db.Customers.AddAsync(customer);
+                await Db.SaveChangesAsync(cancellationToken);
 
-            return customer;
+                return customer;
+            }
         }
     }
 
@@ -66,13 +88,14 @@ namespace PerformanceTesting.Infrastructure.Services
     {
         public static IQueryable<Customer> IncludeDependencies(this IQueryable<Customer> query, bool useSplitQuery)
         {
-            if (useSplitQuery)
-                query = query.AsSplitQuery();
-
             query = query
                 .Include(c => c.Addresses)
                 .Include(c => c.StoreVisits)
-                .ThenInclude(c => c.Store);
+                .ThenInclude(v => v.Store)
+                .ThenInclude(s => s.Address);
+
+            if (useSplitQuery)
+                query = query.AsSplitQuery();
 
             return query;
         }

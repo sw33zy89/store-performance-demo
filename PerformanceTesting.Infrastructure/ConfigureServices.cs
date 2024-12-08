@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PerformanceTesting.Core.Services;
 using PerformanceTesting.Infrastructure.Persistence;
 using PerformanceTesting.Infrastructure.Services;
+using static CSharpFunctionalExtensions.Result;
 
 namespace PerformanceTesting.Infrastructure
 {
@@ -17,12 +18,13 @@ namespace PerformanceTesting.Infrastructure
             //Database
             if (configuration.GetValue<bool>("UseInMemoryDatabase"))
             {
-                services.AddDbContext<AppDbContext>(options =>
-                    options.UseInMemoryDatabase("PerformanceTestDb"));
+                services.AddDbContextFactory<AppDbContext>(options =>
+                    options.UseInMemoryDatabase("PerformanceTestDb")
+                );
             }
             else
             {
-                services.AddDbContext<AppDbContext>(options =>
+                services.AddDbContextFactory<AppDbContext>(options =>
                     options.UseSqlServer(configuration.GetConnectionString("DemoProjectDb") ?? "",
                         builder => builder.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
             }
