@@ -1,5 +1,6 @@
 ﻿using PerformanceTest.API.HealthCheck;
 using PerformanceTesting.Infrastructure.Persistence;
+using PerformanceTesting.Infrastructure.Services;
 
 namespace PerformanceTest.API
 {
@@ -21,6 +22,9 @@ namespace PerformanceTest.API
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             services.AddOpenApi();
+
+            services.AddHttpClient();
+            services.AddHttpClient<OpenMeteoClient>();
 
             return services;
         }

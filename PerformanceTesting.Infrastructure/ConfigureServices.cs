@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using PerformanceTesting.Core.Services;
 using PerformanceTesting.Infrastructure.Persistence;
 using PerformanceTesting.Infrastructure.Services;
-using static CSharpFunctionalExtensions.Result;
 
 namespace PerformanceTesting.Infrastructure
 {
